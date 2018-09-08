@@ -17,8 +17,12 @@ package org.springframework.samples.petclinic.vet;
 
 import java.util.Map;
 import javax.validation.Valid;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,11 +40,14 @@ import org.springframework.web.servlet.ModelAndView;
 class VetController {
 
     private final VetRepository vets;
+    private final SpecialtyRepository specialtyRepository;
 
     private static final String VIEWS_VET_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
+    private static final String VIEWS_SPECIALTIES_CREATE_FORM = "vets/createSpecialtyForm";
 
-    public VetController(VetRepository clinicService) {
+    public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
         this.vets = clinicService;
+        this.specialtyRepository = specialtyRepository;
     }
 
     @GetMapping("/vets.html")
@@ -109,5 +116,29 @@ class VetController {
             return "redirect:/vets/{vetId}";
         }
     }
+    @GetMapping("/vets/{vetId}/specialty/new")
+    public String initCreationSpecialtyForm(@PathVariable("vetId") int vetId, ModelMap model) {
+        Specialty specialty = new Specialty();
+        Vet vet = this.vets.findById(vetId);
+        vet.addSpecialty(specialty);
+        model.addAttribute(vet);
+        model.put("specialty", specialty);
+        return VIEWS_SPECIALTIES_CREATE_FORM;
+    }
 
+    @PostMapping("/vets/{vetId}/specialty/new")
+    public String processCreationSpecialtyForm(@PathVariable("vetId") int vetId, @Valid Specialty specialty, BindingResult result, ModelMap model) {
+        Vet vet = this.vets.findById(vetId);
+        if (vet.hasSpecialty(specialty)) {
+            result.rejectValue("name", "duplicate", "already exists");
+        }
+        vet.addSpecialty(specialty);
+        if (result.hasErrors()) {
+            model.put("specialty", specialty);
+            return VIEWS_SPECIALTIES_CREATE_FORM;
+        } else {
+            this.specialtyRepository.save(specialty);
+            return "redirect:/vets/{vetId}";
+        }
+    }
 }

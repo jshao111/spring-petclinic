@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'specialties')}">
+
+<body>
+
+  <h2>New Specialty</h2>
+  <form th:object="${specialty}" class="form-horizontal" id="add-specialty-form" method="post">
+    <div class="form-group has-feedback">
+      <input
+        th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}" />
+      </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button
+            th:with="text=${specialty['new']} ? 'Add' : 'Update'"
+          class="btn btn-default" type="submit" th:text="${text}">Add Specialty</button>
+      </div>
+    </div>
+  </form>
+</body>
+</html>
