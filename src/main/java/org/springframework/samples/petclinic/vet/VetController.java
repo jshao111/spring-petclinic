@@ -120,7 +120,6 @@ class VetController {
     public String initCreationSpecialtyForm(@PathVariable("vetId") int vetId, ModelMap model) {
         Specialty specialty = new Specialty();
         Vet vet = this.vets.findById(vetId);
-        vet.addSpecialty(specialty);
         model.addAttribute(vet);
         model.put("specialty", specialty);
         return VIEWS_SPECIALTIES_CREATE_FORM;

@@ -3,16 +3,32 @@
 
 <body>
 
-  <h2>New Specialty</h2>
+  <table class="table table-striped" th:object="${vet}">
+    <tr>
+      <th>Name</th>
+      <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
+    </tr>
+    <tr>
+      <th>Current Specialties</th>
+      <td>
+        <span th:each="specialty : ${vet.specialties}"
+              th:text="${specialty.name + ' '}" />
+        <span
+            th:if="${vet.nrOfSpecialties == 0}">none
+        </span>
+      </td>
+    </tr>
+  </table>
+
   <form th:object="${specialty}" class="form-horizontal" id="add-specialty-form" method="post">
     <div class="form-group has-feedback">
       <input
-        th:replace="~{fragments/inputField :: input ('Name', 'name', 'text')}" />
+        th:replace="~{fragments/inputField :: input ('Add specialty', 'name', 'text')}" />
       </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
         <button
-            th:with="text=${specialty['new']} ? 'Add' : 'Update'"
+            th:with="text=${specialty['new']} ? 'OK' : 'OK'"
           class="btn btn-default" type="submit" th:text="${text}">Add Specialty</button>
       </div>
     </div>
