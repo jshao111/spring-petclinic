@@ -15,6 +15,11 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.Collection;
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
@@ -37,11 +42,12 @@ class VisitController {
 
     private final VisitRepository visits;
     private final PetRepository pets;
+    private final VetRepository vets;
 
-
-    public VisitController(VisitRepository visits, PetRepository pets) {
+    public VisitController(VisitRepository visits, PetRepository pets, VetRepository vets) {
         this.visits = visits;
         this.pets = pets;
+        this.vets = vets;
     }
 
     @InitBinder
@@ -76,12 +82,34 @@ class VisitController {
 
     // Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
     @PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-    public String processNewVisitForm(@Valid Visit visit, BindingResult result) {
+    public String processNewVisitForm(@Valid Visit visit, BindingResult result, Map<String, Object> model) {
         if (result.hasErrors()) {
             return "pets/createOrUpdateVisitForm";
         } else {
-            this.visits.save(visit);
-            return "redirect:/owners/{ownerId}";
+            String firstName = visit.getInputVetFirstName();
+            if (StringUtils.isBlank(firstName)) {
+                firstName = StringUtils.EMPTY;
+            }
+            String lastName = visit.getInputVetLastName();
+            if (StringUtils.isBlank(lastName)) {
+                lastName = StringUtils.EMPTY;
+            }
+            Collection<Vet> found_vets = this.vets.findByFirstAndLastName(firstName.trim(),
+                lastName.trim());
+            if (Objects.isNull(found_vets) || found_vets.isEmpty()) {
+                // no vets found
+                result.rejectValue(null, "notFound", firstName + " " + lastName + " is not found.");
+                return "redirect:/vets.html";
+            } else if (found_vets.size() > 1) {
+                result.rejectValue(null, "multiFound", "Foun multiple " + firstName + " " + lastName);
+                return "redirect:/vets.html";
+            }
+            else {
+                Vet vet = found_vets.iterator().next();
+                visit.setVetId(vet.getId());
+                this.visits.save(visit);
+                return "redirect:/owners/{ownerId}";
+            }
         }
     }
 

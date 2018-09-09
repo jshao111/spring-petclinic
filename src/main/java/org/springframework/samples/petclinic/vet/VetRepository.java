@@ -40,7 +40,6 @@ public interface VetRepository extends Repository<Vet, Integer> {
      * @return a <code>Collection</code> of <code>Vet</code>s
      */
     @Transactional(readOnly = true)
-    @Cacheable("vets")
     Collection<Vet> findAll() throws DataAccessException;
 
     /**
@@ -51,10 +50,22 @@ public interface VetRepository extends Repository<Vet, Integer> {
     @Query("SELECT vet FROM Vet vet WHERE vet.id =:id")
     @Transactional(readOnly = true)
     Vet findById(@Param("id") Integer id);
+
     /**
      * Save an {@link Vet} to the data store, either inserting or updating it.
      * @param vet the {@link Vet} to save
      */
     void save(Vet vet);
 
+    /**
+     * Retrieve {@link Vet}s from the data store by first and last name, returning all vets
+     * whose first, last name <i>starts</i> with the given names.
+     * @param firstName Value to search for
+     * @param lastName Value to search for
+     * @return a Collection of matching {@link Vet}s (or an empty Collection if none
+     * found)
+     */
+    @Query("SELECT DISTINCT vet FROM Vet vet left join fetch vet.specialties WHERE (vet.firstName LIKE :firstName%) AND (vet.lastName LIKE :lastName%)")
+    @Transactional(readOnly = true)
+    Collection<Vet> findByFirstAndLastName(@Param("firstName") String firstName, @Param("lastName") String lastName );
 }

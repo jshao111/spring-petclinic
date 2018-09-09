@@ -20,7 +20,8 @@ import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
@@ -39,12 +40,21 @@ public class Visit extends BaseEntity {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @NotEmpty
+    @NotBlank
     @Column(name = "description")
     private String description;
 
     @Column(name = "pet_id")
     private Integer petId;
+
+    @Column(name="vet_id")
+    private Integer vetId;
+
+    @Transient
+    private String inputVetFirstName;
+
+    @Transient
+    private String inputVetLastName;
 
     /**
      * Creates a new instance of Visit for the current date
@@ -75,6 +85,26 @@ public class Visit extends BaseEntity {
 
     public void setPetId(Integer petId) {
         this.petId = petId;
+    }
+
+    public Integer getVetId() {return vetId;}
+
+    public void setVetId(Integer vetId) {this.vetId = vetId;}
+
+    public String getInputVetFirstName() {
+        return inputVetFirstName;
+    }
+
+    public void setInputVetFirstName(String inputVetFirstName) {
+        this.inputVetFirstName = inputVetFirstName;
+    }
+
+    public String getInputVetLastName() {
+        return inputVetLastName;
+    }
+
+    public void setInputVetLastName(String inputVetLastName) {
+        this.inputVetLastName = inputVetLastName;
     }
 
 }

@@ -127,17 +127,17 @@ class VetController {
 
     @PostMapping("/vets/{vetId}/specialty/new")
     public String processCreationSpecialtyForm(@PathVariable("vetId") int vetId, @Valid Specialty specialty, BindingResult result, ModelMap model) {
-        Vet vet = this.vets.findById(vetId);
-        if (vet.hasSpecialty(specialty)) {
-            result.rejectValue("name", "duplicate", "already exists");
-        }
-        vet.addSpecialty(specialty);
         if (result.hasErrors()) {
             model.put("specialty", specialty);
-            return VIEWS_SPECIALTIES_CREATE_FORM;
-        } else {
-            this.specialtyRepository.save(specialty);
-            return "redirect:/vets/{vetId}";
+            return "redirect:/vets.html";
         }
+        Vet vet = this.vets.findById(vetId);
+        if (vet.hasSpecialty(specialty)) {
+            result.rejectValue(null, "multinName", "Specialty with name="+specialty.getName()+ " already exists");
+            return "redirect:/vets.html";
+        }
+        vet.addSpecialty(specialty);
+        this.specialtyRepository.save(specialty);
+        return "redirect:/vets/{vetId}";
     }
 }
