@@ -27,8 +27,9 @@ import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Repository class for <code>Visit</code> domain objects All method names are compliant with Spring Data naming
- * conventions so this interface can easily be extended for Spring Data See here: http://static.springsource.org/spring-data/jpa/docs/current/reference/html/jpa.repositories.html#jpa.query-methods.query-creation
+ * Repository class for <code>Visit</code> domain objects All method names are compliant with Spring
+ * Data naming conventions so this interface can easily be extended for Spring Data See here:
+ * http://static.springsource.org/spring-data/jpa/docs/current/reference/html/jpa.repositories.html#jpa.query-methods.query-creation
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -48,9 +49,18 @@ public interface VisitRepository extends Repository<Visit, Integer> {
     List<Visit> findByPetId(Integer petId);
 
     /**
-     * Remove an {@link Visit} from the data store by id.
+     * Retrieve an {@link Visit} from the data store by id.
      * @param id the id to search for
-     * @return
+     * @return the {@link Visit} if found
+     */
+    @Query("SELECT visit FROM Visit visit WHERE visit.id =:id")
+    @Transactional(readOnly = true)
+    Visit findById(@Param("id") Integer id);
+
+    /**
+     * Remove an {@link Visit} from the data store by id.
+     *
+     * @param id the id to search for
      */
     @Query("DELETE FROM Visit visit WHERE visit.id =:id")
     @Transactional
@@ -59,11 +69,13 @@ public interface VisitRepository extends Repository<Visit, Integer> {
 
     /**
      * Retrieve {@link Visit}s from the data store by vet and the visit time
+     *
      * @param vetId the id of the vet
      * @param appointmentTime the time of the appointment
      * @return a Collection of matching {@link Visit}s (or an empty Collection if none found)
      */
     @Query("SELECT DISTINCT visit FROM Visit visit WHERE visit.vet.id=:id AND visit.time=:time")
     @Transactional(readOnly = true)
-    Collection<Visit> findByVetAndTime(@Param("id") Integer vetId, @Param("time") LocalDateTime appointmentTime);
+    Collection<Visit> findByVetAndTime(@Param("id") Integer vetId,
+        @Param("time") LocalDateTime appointmentTime);
 }
