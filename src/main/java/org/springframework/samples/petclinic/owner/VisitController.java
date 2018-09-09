@@ -19,7 +19,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.vet.VetRepository;
@@ -28,10 +30,11 @@ import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * @author Juergen Hoeller
@@ -124,11 +127,17 @@ class VisitController {
                 result.rejectValue("inputVetFirstName", "notFound", "firstName or LastName is not found.");
                 return PETS_CREATE_OR_UPDATE_FORM;
             } else if (found_vets.size() > 1) {
-                result.rejectValue("inputVetFirstName", "multiFound", "Found Multiple Vets for the firstName and LastName");
+                result.rejectValue("inputVetLastName", "multiFound", "Found Multiple Vets for the firstName and LastName");
                 return PETS_CREATE_OR_UPDATE_FORM;
             }
             else {
                 Vet vet = found_vets.iterator().next();
+                LocalDateTime appointmentTime = visit.getTime();
+                if (isTimeTaken(vet, appointmentTime)) {
+                    result.rejectValue("inputVetLastName", "taken", vet.getFirstName() + " " +
+                        vet.getLastName() + " already has appointment at " + appointmentTime);
+                    return PETS_CREATE_OR_UPDATE_FORM;
+                }
                 visit.setVet(vet);
                 this.visits.save(visit);
                 return "redirect:/owners/{ownerId}";
@@ -141,10 +150,20 @@ class VisitController {
         if (LocalDateTime.now().isAfter(visit_time)) {
             return TimeError.BEFORE_CURRENT;
         }
+
         DayOfWeek dayOfWeek = visit_time.getDayOfWeek();
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
             return  TimeError.WRONG_DATE;
         }
         else return TimeError.NONE;
     }
+
+    private boolean isTimeTaken(Vet vet, LocalDateTime appointmentTime) {
+        Collection<Visit> same_time_visits = visits.findByVetAndTime(vet.getId(), appointmentTime);
+        if (Objects.nonNull(same_time_visits) && same_time_visits.size() > 0) {
+            return true;
+        }
+        else return false;
+    }
+
 }

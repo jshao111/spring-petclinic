@@ -15,11 +15,15 @@
  */
 package org.springframework.samples.petclinic.visit;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
-
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Repository class for <code>Visit</code> domain objects All method names are compliant with Spring Data naming
@@ -42,4 +46,13 @@ public interface VisitRepository extends Repository<Visit, Integer> {
 
     List<Visit> findByPetId(Integer petId);
 
+    /**
+     * Retrieve {@link Visit}s from the data store by vet and the visit time
+     * @param vetId the id of the vet
+     * @param appointmentTime the time of the appointment
+     * @return a Collection of matching {@link Visit}s (or an empty Collection if none found)
+     */
+    @Query("SELECT DISTINCT visit FROM Visit visit WHERE visit.vet.id=:id AND visit.time=:time")
+    @Transactional(readOnly = true)
+    Collection<Visit> findByVetAndTime(@Param("id") Integer vetId, @Param("time") LocalDateTime appointmentTime);
 }
