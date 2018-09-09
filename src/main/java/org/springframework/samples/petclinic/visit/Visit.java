@@ -43,7 +43,7 @@ import org.springframework.samples.petclinic.vet.Vet;
 public class Visit extends BaseEntity {
 
     @Column(name = "visit_time")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:00")
     private LocalDateTime time;
 
     @NotBlank

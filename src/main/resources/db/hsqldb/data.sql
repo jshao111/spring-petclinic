@@ -49,5 +49,5 @@ INSERT INTO pets VALUES (13, 'Sly', '2012-06-08', 1, 10);
 
 INSERT INTO visits VALUES (1, 7, 3, '2013-01-01 12:00:00', 'rabies shot');
 INSERT INTO visits VALUES (2, 8, 2, '2013-01-02 15:00:00', 'rabies shot');
-INSERT INTO visits VALUES (3, 8, 5, '2013-01-03 09:30:00', 'neutered');
-INSERT INTO visits VALUES (4, 7, 6, '2013-01-04 10:30:00', 'spayed');
+INSERT INTO visits VALUES (3, 8, 5, '2013-01-03 09:00:00', 'neutered');
+INSERT INTO visits VALUES (4, 7, 6, '2013-01-04 10:00:00', 'spayed');
