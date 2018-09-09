@@ -106,7 +106,7 @@ class VisitController {
             }
             else {
                 Vet vet = found_vets.iterator().next();
-                visit.setVetId(vet.getId());
+                visit.setVet(vet);
                 this.visits.save(visit);
                 return "redirect:/owners/{ownerId}";
             }

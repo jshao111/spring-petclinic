@@ -17,14 +17,20 @@ package org.springframework.samples.petclinic.visit;
 
 import java.time.LocalDate;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.vet.Vet;
 
 /**
  * Simple JavaBean domain object representing a visit.
@@ -36,9 +42,9 @@ import org.springframework.samples.petclinic.model.BaseEntity;
 @Table(name = "visits")
 public class Visit extends BaseEntity {
 
-    @Column(name = "visit_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    @Column(name = "visit_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime time;
 
     @NotBlank
     @Column(name = "description")
@@ -47,8 +53,9 @@ public class Visit extends BaseEntity {
     @Column(name = "pet_id")
     private Integer petId;
 
-    @Column(name="vet_id")
-    private Integer vetId;
+    @ManyToOne
+    @JoinColumn(name = "vet_id")
+    private Vet vet;
 
     @Transient
     private String inputVetFirstName;
@@ -60,15 +67,15 @@ public class Visit extends BaseEntity {
      * Creates a new instance of Visit for the current date
      */
     public Visit() {
-        this.date = LocalDate.now();
+        this.time = LocalDateTime.now();
     }
 
-    public LocalDate getDate() {
-        return this.date;
+    public LocalDateTime getTime() {
+        return time;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setTime(LocalDateTime time) {
+        this.time = time;
     }
 
     public String getDescription() {
@@ -87,9 +94,14 @@ public class Visit extends BaseEntity {
         this.petId = petId;
     }
 
-    public Integer getVetId() {return vetId;}
+    public Vet getVet() {
+        return vet;
+    }
 
-    public void setVetId(Integer vetId) {this.vetId = vetId;}
+    public void setVet(Vet vet) {
+
+        this.vet = vet;
+    }
 
     public String getInputVetFirstName() {
         return inputVetFirstName;
