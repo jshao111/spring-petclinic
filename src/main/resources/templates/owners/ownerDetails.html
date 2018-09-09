@@ -56,7 +56,7 @@
           <table class="table-condensed">
             <thead>
               <tr>
-                <th>Visit Date</th>
+                <th>Visit Time</th>
                 <th>Description</th>
                 <th>Vet</th>
               </tr>
@@ -71,8 +71,8 @@
                 th:href="@{{ownerId}/pets/{petId}/edit(ownerId=${owner.id},petId=${pet.id})}">Edit
                   Pet</a></td>
               <td><a
-                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owner.id},petId=${pet.id})}">Add
-                  Visit</a></td>
+                th:href="@{{ownerId}/pets/{petId}/visits/new(ownerId=${owner.id},petId=${pet.id})}">Make
+                  Appointment</a></td>
             </tr>
           </table>
         </td>

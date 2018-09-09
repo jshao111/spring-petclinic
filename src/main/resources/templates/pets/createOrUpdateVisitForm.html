@@ -31,7 +31,7 @@
   <form th:object="${visit}" class="form-horizontal" method="post">
     <div class="form-group has-feedback">
       <input
-        th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
+        th:replace="~{fragments/inputField :: input ('Time', 'time', 'datetime-local')}"  />
       <input
           th:replace="~{fragments/inputField :: input ('Vet First Name', 'inputVetFirstName', 'text')}" />
       <input
@@ -52,11 +52,11 @@
   <b>Previous Visits</b>
   <table class="table table-striped">
     <tr>
-      <th>Date</th>
+      <th>Time</th>
       <th>Description</th>
     </tr>
     <tr th:if="${!visit['new']}" th:each="visit : ${pet.visits}">
-      <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}" /></td>
+      <td th:text="${#temporals.format(visit.time, 'yyyy-MM-dd HH:mm')}" /></td>
       <td th:text=" ${visit.description}" /></td>
     </tr>
   </table>

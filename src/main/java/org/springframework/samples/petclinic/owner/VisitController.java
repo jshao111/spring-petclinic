@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,8 @@ import java.util.Map;
  */
 @Controller
 class VisitController {
+
+    private static final String PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdateVisitForm";
 
     private final VisitRepository visits;
     private final PetRepository pets;
@@ -83,9 +86,13 @@ class VisitController {
     // Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
     @PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
     public String processNewVisitForm(@Valid Visit visit, BindingResult result, Map<String, Object> model) {
+        if (!validateAppointment(visit)) {
+            result.rejectValue("time", "past", visit.getTime().toString() + " is in the past.");
+        }
         if (result.hasErrors()) {
-            return "pets/createOrUpdateVisitForm";
-        } else {
+            return PETS_CREATE_OR_UPDATE_FORM;
+        }
+        else {
             String firstName = visit.getInputVetFirstName();
             if (StringUtils.isBlank(firstName)) {
                 firstName = StringUtils.EMPTY;
@@ -98,11 +105,11 @@ class VisitController {
                 lastName.trim());
             if (Objects.isNull(found_vets) || found_vets.isEmpty()) {
                 // no vets found
-                result.rejectValue(null, "notFound", firstName + " " + lastName + " is not found.");
-                return "redirect:/vets.html";
+                result.rejectValue("inputVetFirstName", "notFound", "firstName or LastName is not found.");
+                return PETS_CREATE_OR_UPDATE_FORM;
             } else if (found_vets.size() > 1) {
-                result.rejectValue(null, "multiFound", "Foun multiple " + firstName + " " + lastName);
-                return "redirect:/vets.html";
+                result.rejectValue("inputVetFirstName", "multiFound", "Found Multiple Vets for the firstName and LastName");
+                return PETS_CREATE_OR_UPDATE_FORM;
             }
             else {
                 Vet vet = found_vets.iterator().next();
@@ -113,4 +120,10 @@ class VisitController {
         }
     }
 
+    private static boolean validateAppointment(Visit visit) {
+        if (LocalDateTime.now().isAfter(visit.getTime())) {
+            return false;
+        }
+        else return true;
+    }
 }
