@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -45,6 +46,16 @@ public interface VisitRepository extends Repository<Visit, Integer> {
     void save(Visit visit) throws DataAccessException;
 
     List<Visit> findByPetId(Integer petId);
+
+    /**
+     * Remove an {@link Visit} from the data store by id.
+     * @param id the id to search for
+     * @return
+     */
+    @Query("DELETE FROM Visit visit WHERE visit.id =:id")
+    @Transactional
+    @Modifying
+    void removeById(@Param("id") Integer id);
 
     /**
      * Retrieve {@link Visit}s from the data store by vet and the visit time
