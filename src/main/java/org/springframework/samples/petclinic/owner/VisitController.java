@@ -15,7 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +48,12 @@ class VisitController {
     private final VisitRepository visits;
     private final PetRepository pets;
     private final VetRepository vets;
+
+    public static enum TimeError {
+        NONE,
+        BEFORE_CURRENT,
+        WRONG_DATE
+    };
 
     public VisitController(VisitRepository visits, PetRepository pets, VetRepository vets) {
         this.visits = visits;
@@ -86,8 +94,16 @@ class VisitController {
     // Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
     @PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
     public String processNewVisitForm(@Valid Visit visit, BindingResult result, Map<String, Object> model) {
-        if (!validateAppointment(visit)) {
-            result.rejectValue("time", "past", visit.getTime().toString() + " is in the past.");
+        TimeError timeError = validateAppointment(visit);
+        switch (timeError) {
+            case BEFORE_CURRENT:
+                result.rejectValue("time", "past", visit.getTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00")) + " is in the past.");
+                break;
+            case WRONG_DATE:
+                result.rejectValue("time", "weekend", "The day is a " + visit.getTime().getDayOfWeek());
+                break;
+            default:
+                break;
         }
         if (result.hasErrors()) {
             return PETS_CREATE_OR_UPDATE_FORM;
@@ -120,10 +136,15 @@ class VisitController {
         }
     }
 
-    private static boolean validateAppointment(Visit visit) {
-        if (LocalDateTime.now().isAfter(visit.getTime())) {
-            return false;
+    private static TimeError validateAppointment(Visit visit) {
+        LocalDateTime visit_time = visit.getTime();
+        if (LocalDateTime.now().isAfter(visit_time)) {
+            return TimeError.BEFORE_CURRENT;
         }
-        else return true;
+        DayOfWeek dayOfWeek = visit_time.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            return  TimeError.WRONG_DATE;
+        }
+        else return TimeError.NONE;
     }
 }
