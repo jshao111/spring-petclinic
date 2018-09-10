@@ -44,7 +44,7 @@ class VetController {
     private final SpecialtyRepository specialtyRepository;
 
     private static final String VIEWS_VET_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
-    private static final String VIEWS_SPECIALTIES_CREATE_FORM = "vets/createSpecialtyForm";
+    private static final String VIEWS_SPECIALTIES_CREATE_FORM = "vets/addSpecialtyForm";
 
     public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
         this.vets = clinicService;
