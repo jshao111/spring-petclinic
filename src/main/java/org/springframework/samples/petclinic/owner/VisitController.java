@@ -18,9 +18,12 @@ package org.springframework.samples.petclinic.owner;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.samples.petclinic.vet.Vet;
@@ -47,6 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 class VisitController {
 
     private static final String PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdateVisitForm";
+    private static final String Name_DELIMITER = " ";
 
     private final VisitRepository visits;
     private final PetRepository pets;
@@ -88,6 +92,21 @@ class VisitController {
         return visit;
     }
 
+    @ModelAttribute("vets")
+    public Collection<String> populateVets() {
+        List<String> allVestNames;
+        Collection<Vet> allVets = this.vets.findAll();
+        if (Objects.nonNull(allVets) && allVets.size() > 0) {
+            allVestNames = allVets.stream().map(k ->
+                k.getFirstName() + Name_DELIMITER + k.getLastName())
+                .collect(Collectors.toList());
+        }
+        else {
+            allVestNames = new ArrayList<>();
+        }
+        return allVestNames;
+    }
+
     // Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
     @GetMapping("/owners/*/pets/{petId}/visits/new")
     public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
@@ -112,30 +131,27 @@ class VisitController {
             return PETS_CREATE_OR_UPDATE_FORM;
         }
         else {
-            String firstName = visit.getInputVetFirstName();
-            if (StringUtils.isBlank(firstName)) {
-                firstName = StringUtils.EMPTY;
-            }
-            String lastName = visit.getInputVetLastName();
-            if (StringUtils.isBlank(lastName)) {
-                lastName = StringUtils.EMPTY;
-            }
-            Collection<Vet> found_vets = this.vets.findByFirstAndLastName(firstName.trim(),
-                lastName.trim());
+            String vetFullName = visit.getInputVetFullName();
+            String[] vetFullNameArr = vetFullName.split(Name_DELIMITER);
+            String firstName = vetFullNameArr[0];
+
+            String lastName = vetFullNameArr[1];
+
+            Collection<Vet> found_vets = this.vets.findByFirstAndLastName(firstName,
+                lastName);
             if (Objects.isNull(found_vets) || found_vets.isEmpty()) {
                 // no vets found
-                result.rejectValue("inputVetFirstName", "notFound", "firstName or LastName is not found.");
+                result.rejectValue("inputVetFullName", "notFound", vetFullName + " is not found.");
                 return PETS_CREATE_OR_UPDATE_FORM;
             } else if (found_vets.size() > 1) {
-                result.rejectValue("inputVetLastName", "multiFound", "Found Multiple Vets for the firstName and LastName");
+                result.rejectValue("inputVetFullName", "multiFound", "Found Multiple Vets with name " + vetFullName);
                 return PETS_CREATE_OR_UPDATE_FORM;
             }
             else {
                 Vet vet = found_vets.iterator().next();
                 LocalDateTime appointmentTime = visit.getTime();
                 if (isTimeTaken(vet, appointmentTime)) {
-                    result.rejectValue("inputVetLastName", "taken", vet.getFirstName() + " " +
-                        vet.getLastName() + " already has appointment at " + appointmentTime);
+                    result.rejectValue("inputVetLastName", "taken", vetFullName + " already has appointment at " + appointmentTime);
                     return PETS_CREATE_OR_UPDATE_FORM;
                 }
                 visit.setVet(vet);

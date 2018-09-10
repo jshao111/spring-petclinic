@@ -20,15 +20,15 @@
     </tr>
   </table>
 
-  <form th:object="${specialty}" class="form-horizontal" id="add-specialty-form" method="post">
+  <form th:object="${vet}" class="form-horizontal" id="add-specialty-form" method="post">
     <div class="form-group has-feedback">
       <input
-        th:replace="~{fragments/inputField :: input ('Add specialty', 'name', 'text')}" />
+          th:replace="~{fragments/selectField :: select ('Specialty', 'specialtyToAdd', ${specialties})}" />
       </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
         <button
-            th:with="text=${specialty['new']} ? 'OK' : 'OK'"
+            th:with="text=${vet['new']} ? 'OK' : 'OK'"
           class="btn btn-default" type="submit" th:text="${text}">Add Specialty</button>
       </div>
     </div>

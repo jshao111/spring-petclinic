@@ -53,10 +53,7 @@ public class Visit extends BaseEntity {
     private Vet vet;
 
     @Transient
-    private String inputVetFirstName;
-
-    @Transient
-    private String inputVetLastName;
+    private String inputVetFullName;
 
     /**
      * Creates a new instance of Visit for the current date
@@ -98,20 +95,11 @@ public class Visit extends BaseEntity {
         this.vet = vet;
     }
 
-    public String getInputVetFirstName() {
-        return inputVetFirstName;
+    public String getInputVetFullName() {
+        return inputVetFullName;
     }
 
-    public void setInputVetFirstName(String inputVetFirstName) {
-        this.inputVetFirstName = inputVetFirstName;
+    public void setInputVetFullName(String inputVetFullName) {
+        this.inputVetFullName = inputVetFullName;
     }
-
-    public String getInputVetLastName() {
-        return inputVetLastName;
-    }
-
-    public void setInputVetLastName(String inputVetLastName) {
-        this.inputVetLastName = inputVetLastName;
-    }
-
 }

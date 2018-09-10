@@ -16,20 +16,19 @@
 package org.springframework.samples.petclinic.vet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.support.MutableSortDefinition;
@@ -53,6 +52,9 @@ public class Vet extends Person {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"), inverseJoinColumns = @JoinColumn(name = "specialty_id"))
     private Set<Specialty> specialties;
+
+    @Transient
+    private String specialtyToAdd;
 
     protected Set<Specialty> getSpecialtiesInternal() {
         if (this.specialties == null) {
@@ -88,8 +90,17 @@ public class Vet extends Person {
     }
 
     public void addSpecialty(Specialty specialty) {
-        if (specialty.isNew()) {
+        if (!hasSpecialty(specialty)) {
             getSpecialtiesInternal().add(specialty);
         }
     }
+
+    public String getSpecialtyToAdd() {
+        return specialtyToAdd;
+    }
+
+    public void setSpecialtyToAdd(String specialtyToAdd) {
+        this.specialtyToAdd = specialtyToAdd;
+    }
+
 }

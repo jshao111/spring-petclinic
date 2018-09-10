@@ -34,11 +34,11 @@ public interface SpecialtyRepository extends Repository<Specialty, Integer> {
     /**
      * Retrieve all <code>Specialty</code>s from the data store.
      *
-     * @return a <code>Collection</code> of <code>Vet</code>s
+     * @return a <code>Collection</code> of <code>Specialty</code>s
      */
+    @Query("SELECT specialty FROM Specialty specialty ORDER BY specialty.name")
     @Transactional(readOnly = true)
-    @Cacheable("specialties")
-    Collection<Vet> findAll() throws DataAccessException;
+    Collection<Specialty> findAll() throws DataAccessException;
 
     /**
      * Retrieve an {@link Specialty} from the data store by id.
@@ -47,7 +47,16 @@ public interface SpecialtyRepository extends Repository<Specialty, Integer> {
      */
     @Query("SELECT specialty FROM Specialty specialty WHERE specialty.id =:id")
     @Transactional(readOnly = true)
-    Vet findById(@Param("id") Integer id);
+    Specialty findById(@Param("id") Integer id);
+
+    /**
+     * Retrieve an {@link Specialty} from the data store by name.
+     * @param name the id to search for
+     * @return the {@link Specialty} if found
+     */
+    @Query("SELECT specialty FROM Specialty specialty WHERE specialty.name =:name")
+    @Transactional(readOnly = true)
+    Specialty findByName(@Param("name") String name);
 
     /**
      * Save an {@link Vet} to the data store, either inserting or updating it.

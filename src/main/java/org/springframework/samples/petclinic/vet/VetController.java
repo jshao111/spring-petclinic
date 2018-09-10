@@ -15,16 +15,17 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import javax.validation.Valid;
-import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.Pet;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,6 +49,11 @@ class VetController {
     public VetController(VetRepository clinicService, SpecialtyRepository specialtyRepository) {
         this.vets = clinicService;
         this.specialtyRepository = specialtyRepository;
+    }
+
+    @ModelAttribute("specialties")
+    public Collection<Specialty> populateVetSpecialties() {
+        return this.specialtyRepository.findAll();
     }
 
     @GetMapping("/vets.html")
@@ -116,28 +122,23 @@ class VetController {
             return "redirect:/vets/{vetId}";
         }
     }
-    @GetMapping("/vets/{vetId}/specialty/new")
+    @GetMapping("/vets/{vetId}/specialty/add")
     public String initCreationSpecialtyForm(@PathVariable("vetId") int vetId, ModelMap model) {
-        Specialty specialty = new Specialty();
         Vet vet = this.vets.findById(vetId);
         model.addAttribute(vet);
-        model.put("specialty", specialty);
         return VIEWS_SPECIALTIES_CREATE_FORM;
     }
 
-    @PostMapping("/vets/{vetId}/specialty/new")
-    public String processCreationSpecialtyForm(@PathVariable("vetId") int vetId, @Valid Specialty specialty, BindingResult result, ModelMap model) {
+    @PostMapping("/vets/{vetId}/specialty/add")
+    public String processCreationSpecialtyForm(Vet vet, @PathVariable("vetId") int vetId, BindingResult result, ModelMap model) {
         if (result.hasErrors()) {
-            model.put("specialty", specialty);
             return "redirect:/vets.html";
         }
-        Vet vet = this.vets.findById(vetId);
-        if (vet.hasSpecialty(specialty)) {
-            result.rejectValue(null, "multinName", "Specialty with name="+specialty.getName()+ " already exists");
-            return "redirect:/vets.html";
-        }
+        String specialtyName = vet.getSpecialtyToAdd();
+        Specialty specialty = specialtyRepository.findByName(specialtyName);
+        vet = this.vets.findById(vetId);
         vet.addSpecialty(specialty);
-        this.specialtyRepository.save(specialty);
+        this.vets.save(vet);
         return "redirect:/vets/{vetId}";
     }
 }
