@@ -151,7 +151,7 @@ class VisitController {
                 Vet vet = found_vets.iterator().next();
                 LocalDateTime appointmentTime = visit.getTime();
                 if (isTimeTaken(vet, appointmentTime)) {
-                    result.rejectValue("inputVetLastName", "taken", vetFullName + " already has appointment at " + appointmentTime);
+                    result.rejectValue("inputVetFullName", "taken", vetFullName + " already has appointment at " + appointmentTime);
                     return PETS_CREATE_OR_UPDATE_FORM;
                 }
                 visit.setVet(vet);

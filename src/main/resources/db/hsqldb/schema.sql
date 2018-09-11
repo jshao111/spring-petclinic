@@ -18,7 +18,7 @@ CREATE TABLE specialties (
   id   INTEGER IDENTITY PRIMARY KEY,
   name VARCHAR(80)
 );
-CREATE INDEX specialties_name ON specialties (name);
+CREATE UNIQUE INDEX specialties_name ON specialties (name);
 
 CREATE TABLE vet_specialties (
   vet_id       INTEGER NOT NULL,

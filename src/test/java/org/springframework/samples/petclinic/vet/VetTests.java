@@ -15,11 +15,11 @@
  */
 package org.springframework.samples.petclinic.vet;
 
-import org.junit.Test;
-
-import org.springframework.util.SerializationUtils;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
+import org.junit.Assert;
+import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
@@ -40,4 +40,28 @@ public class VetTests {
         assertThat(other.getId()).isEqualTo(vet.getId());
     }
 
+    @Test
+    public void testAddSpecialty() {
+        Vet vet = new Vet();
+        Specialty specialty1 = new Specialty();
+        specialty1.setName("surgery");
+        vet.addSpecialty(specialty1);
+        Assert.assertEquals(1, vet.getNrOfSpecialties());
+
+        Specialty specialty2 = new Specialty();
+        specialty2.setName("dentistry");
+        vet.addSpecialty(specialty2);
+        Assert.assertEquals(2, vet.getNrOfSpecialties());
+
+        vet.addSpecialty(specialty1);
+        Assert.assertEquals(2, vet.getNrOfSpecialties());
+
+        vet.addSpecialty(null);
+        Assert.assertEquals(2, vet.getNrOfSpecialties());
+
+        vet.addSpecialty(new Specialty());
+        Assert.assertEquals(2, vet.getNrOfSpecialties());
+
+        Assert.assertEquals("dentistry", vet.getSpecialties().get(0).getName());
+    }
 }

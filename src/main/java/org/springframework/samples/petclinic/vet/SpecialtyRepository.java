@@ -16,7 +16,6 @@
 package org.springframework.samples.petclinic.vet;
 
 import java.util.Collection;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -57,11 +56,5 @@ public interface SpecialtyRepository extends Repository<Specialty, Integer> {
     @Query("SELECT specialty FROM Specialty specialty WHERE specialty.name =:name")
     @Transactional(readOnly = true)
     Specialty findByName(@Param("name") String name);
-
-    /**
-     * Save an {@link Vet} to the data store, either inserting or updating it.
-     * @param specialty the {@link Vet} to save
-     */
-    void save(Specialty specialty);
 
 }

@@ -63,10 +63,6 @@ public class Vet extends Person {
         return this.specialties;
     }
 
-    protected void setSpecialtiesInternal(Set<Specialty> specialties) {
-        this.specialties = specialties;
-    }
-
     @XmlElement
     public List<Specialty> getSpecialties() {
         List<Specialty> sortedSpecs = new ArrayList<>(getSpecialtiesInternal());
@@ -79,14 +75,17 @@ public class Vet extends Person {
         return getSpecialtiesInternal().size();
     }
 
-    public boolean hasSpecialty(Specialty specialty) {
+    private boolean hasSpecialty(Specialty specialty) {
+        if (Objects.isNull(specialty)
+            || StringUtils.isBlank(specialty.getName())) {
+            return true; // "blank" specialty. Always has it.
+        }
+
         Set<String> names = getSpecialtiesInternal().stream()
             .map(k -> k.getName().toLowerCase())
             .collect(Collectors.toSet());
 
-        return (Objects.nonNull(specialty)
-            && StringUtils.isNotBlank(specialty.getName())
-            && names.contains(specialty.getName().toLowerCase()));
+        return names.contains(specialty.getName().toLowerCase());
     }
 
     public void addSpecialty(Specialty specialty) {

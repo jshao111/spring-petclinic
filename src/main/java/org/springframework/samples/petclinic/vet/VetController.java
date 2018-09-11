@@ -113,24 +113,29 @@ class VetController {
     }
 
     @PostMapping("/vets/{vetId}/edit")
-    public String processUpdateVetForm(@Valid Vet vet, BindingResult result, @PathVariable("vetId") int vetId) {
+    public String processUpdateVetForm(@Valid Vet vet, BindingResult result, @PathVariable("vetId") int vetId, ModelMap modelMap) {
         if (result.hasErrors()) {
             return VIEWS_VET_CREATE_OR_UPDATE_FORM;
         } else {
+            String firstName = vet.getFirstName();
+            String lastName = vet.getLastName();
+            vet = this.vets.findById(vetId);
             vet.setId(vetId);
+            vet.setFirstName(firstName);
+            vet.setLastName(lastName);
             this.vets.save(vet);
             return "redirect:/vets/{vetId}";
         }
     }
     @GetMapping("/vets/{vetId}/specialty/add")
-    public String initCreationSpecialtyForm(@PathVariable("vetId") int vetId, ModelMap model) {
+    public String initAddSpecialtyForm(@PathVariable("vetId") int vetId, ModelMap model) {
         Vet vet = this.vets.findById(vetId);
         model.addAttribute(vet);
         return VIEWS_SPECIALTIES_CREATE_FORM;
     }
 
     @PostMapping("/vets/{vetId}/specialty/add")
-    public String processCreationSpecialtyForm(Vet vet, @PathVariable("vetId") int vetId, BindingResult result, ModelMap model) {
+    public String processAddSpecialtyForm(Vet vet, @PathVariable("vetId") int vetId, BindingResult result, ModelMap model) {
         if (result.hasErrors()) {
             return "redirect:/vets.html";
         }
