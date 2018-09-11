@@ -48,7 +48,7 @@ public interface VetRepository extends Repository<Vet, Integer> {
      * @param id the id to search for
      * @return the {@link Vet} if found
      */
-    @Query("SELECT vet FROM Vet vet left join fetch vet.specialties WHERE vet.id =:id")
+    @Query("SELECT vet FROM Vet vet WHERE vet.id =:id")
     @Transactional(readOnly = true)
     Vet findById(@Param("id") Integer id);
 
@@ -66,7 +66,7 @@ public interface VetRepository extends Repository<Vet, Integer> {
      * @return a Collection of matching {@link Vet}s (or an empty Collection if none
      * found)
      */
-    @Query("SELECT DISTINCT vet FROM Vet vet left join fetch vet.specialties WHERE (vet.firstName LIKE :firstName%) AND (vet.lastName LIKE :lastName%)")
+    @Query("SELECT DISTINCT vet FROM Vet vet WHERE (vet.firstName LIKE :firstName%) AND (vet.lastName LIKE :lastName%)")
     @Transactional(readOnly = true)
     Collection<Vet> findByFirstAndLastName(@Param("firstName") String firstName, @Param("lastName") String lastName );
 }
