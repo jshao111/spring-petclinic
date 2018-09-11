@@ -65,7 +65,7 @@
               <td th:text="${#temporals.format(visit.time, 'yyyy-MM-dd HH:mm')}"></td>
               <td th:text="${visit.description}"></td>
               <td th:text="${visit.vet.firstName + ' ' + visit.vet.lastName}"></td>
-              <td><a
+              <td th:hidden="${!visit.isAppointment()}"><a
                   th:href="@{{ownerId}/pets/{petId}/visits/{visitId}/cancel(ownerId=${owner.id},petId=${pet.id},visitId=${visit.id})}">Cancel
                 Appointment</a></td>
             </tr>

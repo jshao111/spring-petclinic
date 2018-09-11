@@ -102,4 +102,8 @@ public class Visit extends BaseEntity {
     public void setInputVetFullName(String inputVetFullName) {
         this.inputVetFullName = inputVetFullName;
     }
+
+    public boolean isAppointment() {
+        return this.getTime().isAfter(LocalDateTime.now());
+    }
 }

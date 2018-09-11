@@ -125,4 +125,17 @@ public class VetControllerTests {
             .andExpect(status().isOk())
             .andExpect(view().name("vets/createOrUpdateVetForm"));
     }
+
+    @Test
+    public void testEditVetPostRequest() throws Exception {
+        Vet vet = new Vet();
+        vet.setFirstName("Bob");
+        vet.setLastName("Handsaker");
+        given(this.vets.findById(anyInt())).willReturn(vet);
+        mockMvc.perform(post("/vets/{vetId}/edit", TEST_VET_ID)
+            .param("firstName", "John")
+            .param("lastName", "Doe"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/vets/{vetId}"));
+    }
 }
